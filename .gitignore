@@ -1,0 +1,71 @@
+# ============================================================
+# LifeLane Mini – root .gitignore
+# ============================================================
+
+# ── Java / Maven ────────────────────────────────────────────
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# ── Gradle (if ever used) ───────────────────────────────────
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ── Node / npm / Vite ───────────────────────────────────────
+node_modules/
+dist/
+.vite/
+.pnp
+.pnp.js
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+
+# ── Docker ──────────────────────────────────────────────────
+# (keep docker-compose.yml and Dockerfiles tracked; ignore runtime artefacts)
+.docker/
+
+# ── Environment / secrets ───────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ── OSRM pre-processed data ─────────────────────────────────
+osrm-data/*.osrm
+osrm-data/*.osrm.*
+osrm-data/*.osm.pbf
+
+# ── IDE / OS ─────────────────────────────────────────────────
+.idea/
+*.iml
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+
+# ── Logs ─────────────────────────────────────────────────────
+*.log
+logs/
+
+# ── Test / coverage artefacts ────────────────────────────────
+coverage/
+*.lcov
+surefire-reports/

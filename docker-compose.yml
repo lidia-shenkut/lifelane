@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: lifelane-postgres
+    environment:
+      POSTGRES_DB: lifelane
+      POSTGRES_USER: lifelane
+      POSTGRES_PASSWORD: lifelane_secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - lifelane-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lifelane"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  osrm:
+    image: osrm/osrm-backend:v5.27
+    container_name: lifelane-osrm
+    volumes:
+      - ./osrm-data:/data
+    command: >
+      osrm-routed --algorithm mld /data/addis-ababa.osrm
+    ports:
+      - "5000:5000"
+    networks:
+      - lifelane-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lifelane-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lifelane
+      SPRING_DATASOURCE_USERNAME: lifelane
+      SPRING_DATASOURCE_PASSWORD: lifelane_secret
+      OSRM_BASE_URL: http://osrm:5000
+      ML_ENABLED: "false"
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      osrm:
+        condition: service_started
+    networks:
+      - lifelane-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: lifelane-frontend
+    environment:
+      REACT_APP_API_BASE_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - lifelane-net
+
+volumes:
+  postgres_data:
+
+networks:
+  lifelane-net:
+    driver: bridge
